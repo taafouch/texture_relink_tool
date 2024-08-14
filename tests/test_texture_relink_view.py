@@ -1,6 +1,7 @@
 import pytest
 import mock
 
+
 # Mock TextureRelinkView class
 class MockTextureRelinkView:
     def __init__(self):
@@ -23,9 +24,11 @@ class MockTextureRelinkView:
         self._plain_text = "\n".join(["{node}: {path}".format(node=node, path=path)
                                       for node, path in relinked_textures])
 
+
 @pytest.fixture
 def view():
     return MockTextureRelinkView()
+
 
 def test_init(view):
     assert hasattr(view, 'find_button')
@@ -36,15 +39,18 @@ def test_init(view):
     assert hasattr(view, 'result_text')
     assert hasattr(view, 'progress_bar')
 
+
 def test_display_missing_textures(view):
     missing_textures = {'shader1': ['/path/texture1.jpg']}
     view.display_missing_textures(missing_textures)
     assert 'shader1' in view._plain_text
     assert '/path/texture1.jpg' in view._plain_text
 
+
 def test_update_progress(view):
     view.update_progress(50)
     view.progress_bar.setValue.assert_called_once_with(50)
+
 
 def test_display_relinked_textures(view):
     relinked_textures = [('file1', '/new/path/texture1.jpg'), ('file2', '/new/path/texture2.jpg')]

@@ -1,49 +1,103 @@
 import pytest
-import mock
 import os
-
-# Mock the maya_utils module
-mock_maya_utils = mock.MagicMock()
-mock_maya_utils.get_file_nodes.return_value = ['file1', 'file2']
-mock_maya_utils.get_file_texture_path.return_value = '/fake/path/texture.jpg'
-mock_maya_utils.get_shader_name.return_value = 'shader1'
+from texture_relink.texture_relink_model import TextureRelinkModel
 
 
-# Patch the maya_utils import in the texture_relink_model module
-@mock.patch('texture_relink.texture_relink_model.maya_utils', mock_maya_utils)
+class MockMayaUtils:
+    def get_file_nodes(self):
+        return ['file1', 'file2']
+
+    def get_file_texture_path(self, node):
+        paths = {
+            'file1': '/path/to/texture1.jpg',
+            'file2': '/path/to/texture2.jpg'
+        }
+        return paths.get(node, '')
+
+    def get_shader_name(self, node):
+        shaders = {
+            'file1': 'shader1',
+            'file2': 'shader2'
+        }
+        return shaders.get(node, '')
+
+    def get_file_node_from_shader(self, shader):
+        return 'file_node'
+
+    def set_file_texture_path(self, node, path):
+        pass
+
+
 @pytest.fixture
-def model():
-    from texture_relink.texture_relink_model import TextureRelinkModel
+def mock_maya_utils(monkeypatch):
+    mock_utils = MockMayaUtils()
+    monkeypatch.setattr('texture_relink.texture_relink_model.maya_utils', mock_utils)
+    return mock_utils
+
+
+@pytest.fixture
+def texture_relink_model():
     return TextureRelinkModel()
 
 
-def test_find_missing_textures(model):
-    # Set up the mock to simulate a missing texture
-    mock_maya_utils.get_file_texture_path.return_value = '/non/existent/path.jpg'
+def test_find_missing_textures(monkeypatch, mock_maya_utils):
+    def mock_exists(path):
+        return path == '/path/to/texture2.jpg'
 
-    result = model.find_missing_textures()
-    assert isinstance(result, dict)
-    assert 'shader1' in result
-    assert '/non/existent/path.jpg' in result['shader1']
+    monkeypatch.setattr(os.path, 'exists', mock_exists)
 
-
-def test_relink_textures(model, tmpdir):
-    # Create a temporary texture file
-    new_root = tmpdir.mkdir("new_textures")
-    new_file = new_root.join("texture.jpg")
-    new_file.write("dummy content")
-
-    # Set up the mock to simulate finding the new texture
-    def mock_find_texture(root_path, file_name, recursive):
-        return os.path.join(str(new_root), file_name)
-
-    with mock.patch.object(model, 'find_texture', side_effect=mock_find_texture):
-        result = list(model.relink_textures(str(new_root), recursive=True))
-
-    assert len(result) > 0
-    assert any(isinstance(item[0], basestring) for item in result)  # Check for relinked textures
-    assert any(isinstance(item[0], int) for item in result)  # Check for progress updates
+    result = TextureRelinkModel.find_missing_textures()
+    assert result == {'shader1': ['/path/to/texture1.jpg']}
 
 
-if __name__ == '__main__':
-    pytest.main(['-v', __file__])
+def test_relink_textures(monkeypatch, texture_relink_model, mock_maya_utils):
+    def mock_find_missing_textures(self):
+        return {
+            'shader1': ['/old/path/texture1.jpg'],
+            'shader2': ['/old/path/texture2.jpg', '/old/path/texture3.jpg']
+        }
+
+    def mock_find_texture(self, root_path, file_name, recursive):
+        if file_name == 'texture1.jpg':
+            return '/new/path/texture1.jpg'
+        elif file_name == 'texture2.jpg':
+            return '/new/path/texture2.jpg'
+        else:
+            return None
+
+    monkeypatch.setattr(TextureRelinkModel, 'find_missing_textures', mock_find_missing_textures)
+    monkeypatch.setattr(TextureRelinkModel, 'find_texture', mock_find_texture)
+
+    result = list(texture_relink_model.relink_textures('/new/path', recursive=True))
+    print(result)
+    assert result == [
+        ('file_node', '/new/path/texture2.jpg'),
+        (1, 3),
+        (2, 3),
+        ('file_node', '/new/path/texture1.jpg'),
+        (3, 3)
+    ]
+
+
+def test_find_texture(texture_relink_model, tmp_path):
+    # Create a temporary directory structure
+    sub_dir = tmp_path / "subdir"
+    sub_dir.mkdir()
+    (tmp_path / "texture1.jpg").touch()
+    (sub_dir / "texture2.jpg").touch()
+
+    # Test finding a texture in the root directory
+    result = texture_relink_model.find_texture(str(tmp_path), "texture1.jpg", False)
+    assert result == str(tmp_path / "texture1.jpg")
+
+    # Test finding a texture in a subdirectory with recursive search
+    result = texture_relink_model.find_texture(str(tmp_path), "texture2.jpg", True)
+    assert result == str(sub_dir / "texture2.jpg")
+
+    # Test not finding a texture
+    result = texture_relink_model.find_texture(str(tmp_path), "nonexistent.jpg", True)
+    assert result is None
+
+    # Test non-recursive search doesn't find texture in subdirectory
+    result = texture_relink_model.find_texture(str(tmp_path), "texture2.jpg", False)
+    assert result is None
