@@ -8,7 +8,7 @@ setup(
     description="A tool for finding and relinking missing textures in Maya",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/TextureRelinkTool",
+    url="https://github.com/taafouch/texture_relink_tool",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     classifiers=[
