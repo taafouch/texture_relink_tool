@@ -8,7 +8,8 @@ def mock_maya(monkeypatch):
     mock_cmds = mock.MagicMock()
     mock_cmds.ls.return_value = ['file1', 'file2']
     mock_cmds.getAttr.return_value = '/path/to/texture.jpg'
-    mock_cmds.listConnections.side_effect = [['shadingEngine1'], ['shader1']]
+    mock_cmds.listConnections.side_effect = [['shader1']]
+    mock_cmds.nodeType.return_value = 'phong'
 
     monkeypatch.setattr('texture_relink.maya_utils.cmds', mock_cmds)
     monkeypatch.setattr('texture_relink.maya_utils.omui', mock.MagicMock())

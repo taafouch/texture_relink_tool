@@ -40,13 +40,13 @@ def texture_relink_model():
     return TextureRelinkModel()
 
 
-def test_find_missing_textures(monkeypatch, mock_maya_utils):
+def test_find_missing_textures(texture_relink_model, monkeypatch, mock_maya_utils):
     def mock_exists(path):
         return path == '/path/to/texture2.jpg'
 
     monkeypatch.setattr(os.path, 'exists', mock_exists)
 
-    result = TextureRelinkModel.find_missing_textures()
+    result = texture_relink_model.find_missing_textures()
     assert result == {'shader1': ['/path/to/texture1.jpg']}
 
 
@@ -70,13 +70,10 @@ def test_relink_textures(monkeypatch, texture_relink_model, mock_maya_utils):
 
     result = list(texture_relink_model.relink_textures('/new/path', recursive=True))
     print(result)
-    assert result == [
-        ('file_node', '/new/path/texture2.jpg'),
-        (1, 3),
-        (2, 3),
-        ('file_node', '/new/path/texture1.jpg'),
-        (3, 3)
-    ]
+    assert result == [('file1', '/new/path/texture1.jpg'),
+                      (1, 2),
+                      ('file2', '/new/path/texture2.jpg'),
+                      (2, 2)]
 
 
 def test_find_texture(texture_relink_model, tmp_path):

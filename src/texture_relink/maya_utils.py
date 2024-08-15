@@ -7,12 +7,15 @@ from __future__ import print_function
 try:
     from maya import cmds
     import maya.OpenMayaUI as omui
+
     MAYA_AVAILABLE = True
 except ImportError:
     import mock
+
     cmds = mock.MagicMock()
     omui = mock.MagicMock()
     MAYA_AVAILABLE = False
+
 
 def get_maya_version():
     """Get the current Maya version."""
@@ -20,6 +23,7 @@ def get_maya_version():
         return int(cmds.about(version=True))
     else:
         return 2022  # Default to a recent version for testing
+
 
 def import_pyside():
     """Import the appropriate PySide and Shiboken modules based on Maya version."""
@@ -50,6 +54,7 @@ def import_pyside():
 
     return QtCore, QtGui, QtWidgets, shiboken
 
+
 def maya_main_window():
     """Return the Maya main window widget as a Python object."""
     if not MAYA_AVAILABLE:
@@ -57,27 +62,39 @@ def maya_main_window():
 
     QtCore, QtGui, QtWidgets, shiboken = import_pyside()
     main_window_ptr = omui.MQtUtil.mainWindow()
-    return shiboken.wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
+    return shiboken.wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
+
 
 def get_file_nodes():
     """Returns all file nodes in the scene."""
     return cmds.ls(type='file')
 
+
 def get_file_texture_path(node):
     """Returns the texture path for a given file node."""
     return cmds.getAttr('{0}.fileTextureName'.format(node))
+
 
 def set_file_texture_path(node, path):
     """Sets the texture path for a given file node."""
     cmds.setAttr('{0}.fileTextureName'.format(node), path, type='string')
 
+
 def get_shader_name(file_node):
     """Returns the name of the shader connected to the file node."""
-    connections = cmds.listConnections(file_node, type='shadingEngine')
-    if connections:
-        return cmds.listConnections(connections[0] + '.surfaceShader')[0]
-    else:
+    connections = cmds.listConnections(file_node, plugs=True, source=False, destination=True)
+
+    if not connections:
         return "Unknown Shader"
+    for conn in connections:
+        connected_node = conn.split('.')[0]  # Extract the node name from the connection
+        node_type = cmds.nodeType(connected_node)
+
+        # Check if the connected node is a shader
+        if node_type in ["lambert", "blinn", "phong", "phongE", "surfaceShader", "aiStandardSurface"]:
+            return connected_node
+    return "Unknown Shader"
+
 
 def get_file_node_from_shader(shader_name):
     """Returns the file node connected to the given shader."""
