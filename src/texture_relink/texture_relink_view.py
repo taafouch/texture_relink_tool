@@ -7,9 +7,8 @@ from __future__ import print_function
 import json
 import os.path
 
-from texture_relink import maya_utils
-from texture_relink.texture_relink_controller import TextureRelinkController
-from texture_relink.texture_relink_model import TextureRelinkModel
+from . import maya_utils, texture_relink_controller, texture_relink_model
+
 
 QtCore, QtGui, QtWidgets, shiboken = maya_utils.import_pyside()
 
@@ -19,15 +18,15 @@ class TextureRelinkView(QtWidgets.QWidget):
 
     def __init__(self, parent=None):
         super(TextureRelinkView, self).__init__(parent)
-        self.model = TextureRelinkModel()
-        self.controller = TextureRelinkController(self.model, self)
+        self.model = texture_relink_model.TextureRelinkModel()
+        self.controller = texture_relink_controller.TextureRelinkController(self.model, self)
         self.init_ui()
 
     def init_ui(self):
         """Initializes the user interface."""
         layout = QtWidgets.QVBoxLayout(self)
 
-        self.find_button = QtWidgets.QPushButton('Find Missing Textures')
+        self.find_button = QtWidgets.QPushButton("Find Missing Textures")
         self.find_button.clicked.connect(self.controller.find_missing_textures)
         layout.addWidget(self.find_button)
 
@@ -40,10 +39,10 @@ class TextureRelinkView(QtWidgets.QWidget):
         browse_layout.addWidget(self.browse_button)
         layout.addWidget(browse_widget)
 
-        self.recursive_checkbox = QtWidgets.QCheckBox('Search subfolders recursively')
+        self.recursive_checkbox = QtWidgets.QCheckBox("Search subfolders recursively")
         layout.addWidget(self.recursive_checkbox)
 
-        self.relink_button = QtWidgets.QPushButton('Relink Textures')
+        self.relink_button = QtWidgets.QPushButton("Relink Textures")
         self.relink_button.clicked.connect(self.relink_textures)
         layout.addWidget(self.relink_button)
 
@@ -55,7 +54,7 @@ class TextureRelinkView(QtWidgets.QWidget):
         layout.addWidget(self.progress_bar)
 
         self.setLayout(layout)
-        self.setWindowTitle('Texture Relink')
+        self.setWindowTitle("Texture Relink")
         self.setMinimumWidth(400)
         self.setMinimumHeight(300)
 
@@ -78,7 +77,7 @@ class TextureRelinkView(QtWidgets.QWidget):
 
     def display_missing_textures(self, count):
         """Displays the count of missing textures."""
-        self.result_text.setText('Found missing textures:\n{0}'.format(json.dumps(count, indent=4)))
+        self.result_text.setText("Found missing textures:\n{0}".format(json.dumps(count, indent=4)))
         self.relink_button.setEnabled(True)
 
     def update_progress(self, value):
@@ -87,7 +86,7 @@ class TextureRelinkView(QtWidgets.QWidget):
 
     def display_relinked_textures(self, relinked_textures):
         """Displays the results of the relinking process."""
-        result = 'Relinked {0} textures:\n\n'.format(len(relinked_textures))
+        result = "Relinked {0} textures:\n\n".format(len(relinked_textures))
         for node, new_path in relinked_textures:
-            result += '\t-{0}: {1}\n'.format(node, new_path)
+            result += "\t-{0}: {1}\n".format(node, new_path)
         self.result_text.setText(result)

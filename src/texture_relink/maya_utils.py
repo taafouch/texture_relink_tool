@@ -1,8 +1,6 @@
 """Utility functions for Maya operations."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 try:
     from maya import cmds
@@ -67,17 +65,17 @@ def maya_main_window():
 
 def get_file_nodes():
     """Returns all file nodes in the scene."""
-    return cmds.ls(type='file')
+    return cmds.ls(type="file")
 
 
 def get_file_texture_path(node):
     """Returns the texture path for a given file node."""
-    return cmds.getAttr('{0}.fileTextureName'.format(node))
+    return cmds.getAttr("{0}.fileTextureName".format(node))
 
 
 def set_file_texture_path(node, path):
     """Sets the texture path for a given file node."""
-    cmds.setAttr('{0}.fileTextureName'.format(node), path, type='string')
+    cmds.setAttr("{0}.fileTextureName".format(node), path, type="string")
 
 
 def get_shader_name(file_node):
@@ -87,7 +85,7 @@ def get_shader_name(file_node):
     if not connections:
         return "Unknown Shader"
     for conn in connections:
-        connected_node = conn.split('.')[0]  # Extract the node name from the connection
+        connected_node = conn.split(".")[0]  # Extract the node name from the connection
         node_type = cmds.nodeType(connected_node)
 
         # Check if the connected node is a shader
@@ -98,7 +96,7 @@ def get_shader_name(file_node):
 
 def get_file_node_from_shader(shader_name):
     """Returns the file node connected to the given shader."""
-    connections = cmds.listConnections(shader_name, type='file')
+    connections = cmds.listConnections(shader_name, type="file")
     if connections:
         return connections[0]
     return None

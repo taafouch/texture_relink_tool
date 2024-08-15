@@ -1,13 +1,10 @@
 """Main file to launch the Texture Relink tool."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
 
-from . import maya_utils
+from . import maya_utils, texture_relink_view
 
-from .texture_relink_view import TextureRelinkView
 
 QtCore, QtGui, QtWidgets, shiboken = maya_utils.import_pyside()
 
@@ -25,7 +22,7 @@ class TextureRelinkWindow(QtWidgets.QDialog):
 
     def __init__(self, parent=None):
         super(TextureRelinkWindow, self).__init__(parent)
-        self.view = TextureRelinkView(self)
+        self.view = texture_relink_view.TextureRelinkView(self)
         self.setLayout(self.view.layout())
         self.setWindowTitle(self.view.windowTitle())
         self.setMinimumSize(self.view.minimumSize())
@@ -45,5 +42,5 @@ def main():
     dialog.activateWindow()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

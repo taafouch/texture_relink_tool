@@ -20,9 +20,8 @@ setup(
     ],
     python_requires=">=2.7",
     install_requires=[
-        # Add any dependencies here. 
-        # Note: typically, you wouldn't include Maya-specific libraries
-        # as they're provided by the Maya environment.
+        "pytest==6.2.5",
+        "mock==4.0.3"
     ],
     entry_points={
         "console_scripts": [

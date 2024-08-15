@@ -7,7 +7,7 @@ def mock_maya_main_window(monkeypatch):
     class MockMainWindow:
         pass
 
-    monkeypatch.setattr('texture_relink.maya_utils.maya_main_window', lambda: MockMainWindow())
+    monkeypatch.setattr("texture_relink.maya_utils.maya_main_window", lambda: MockMainWindow())
 
 
 @pytest.fixture
@@ -29,12 +29,12 @@ def mock_texture_relink_window(monkeypatch):
         def activateWindow(self):
             pass
 
-    monkeypatch.setattr('texture_relink.main.TextureRelinkWindow', MockTextureRelinkWindow)
+    monkeypatch.setattr("texture_relink.main.TextureRelinkWindow", MockTextureRelinkWindow)
 
 
 def test_main(mock_maya_main_window, mock_texture_relink_window):
     main.main()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

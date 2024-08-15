@@ -43,7 +43,7 @@ main.main()
 
 ### Programmatic Usage
 
-You can also use the core functionality of the Texture Relink Tool without the GUI. Here's how to use it programmatically:
+You can also use the core functionality of the Texture Relink Tool without the GUI. Here"s how to use it programmatically:
 
 ```python
 from texture_relink.texture_relink_model import TextureRelinkModel
@@ -57,7 +57,7 @@ print("Missing textures:", missing_textures)
 
 # Relink textures
 new_root_path = "/path/to/new/texture/directory"
-recursive = True  # Set to False if you don't want to search subdirectories
+recursive = True  # Set to False if you don"t want to search subdirectories
 
 relink_generator = model.relink_textures(new_root_path, recursive)
 
@@ -113,7 +113,7 @@ To run the unit tests in a standalone Python 2.7 environment:
    pip install pytest mock
    ```
 
-2. Navigate to the project's test directory.
+2. Navigate to the project"s test directory.
 
 3. Run the tests using:
    ```
@@ -132,7 +132,7 @@ Contributions to the Texture Relink Tool are welcome! Please feel free to submit
 2. Create a new branch for your feature or bug fix.
 3. Write tests for your changes.
 4. Ensure all tests pass before submitting a pull request.
-5. Update the documentation if you're introducing new features or changing functionality.
+5. Update the documentation if you"re introducing new features or changing functionality.
 
 ## License
 

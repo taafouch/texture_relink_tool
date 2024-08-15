@@ -2,6 +2,6 @@
 pytest==6.2.5
 mock==4.0.3
 
-# Note: PySide2 is typically provided by Maya, so we don't include it here.
+# Note: PySide2 is typically provided by Maya, so we don"t include it here.
 # If you need it for development outside Maya, uncomment the following line:
 # PySide2==5.15.2

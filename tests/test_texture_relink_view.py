@@ -31,20 +31,20 @@ def view():
 
 
 def test_init(view):
-    assert hasattr(view, 'find_button')
-    assert hasattr(view, 'folder_input')
-    assert hasattr(view, 'browse_button')
-    assert hasattr(view, 'recursive_checkbox')
-    assert hasattr(view, 'relink_button')
-    assert hasattr(view, 'result_text')
-    assert hasattr(view, 'progress_bar')
+    assert hasattr(view, "find_button")
+    assert hasattr(view, "folder_input")
+    assert hasattr(view, "browse_button")
+    assert hasattr(view, "recursive_checkbox")
+    assert hasattr(view, "relink_button")
+    assert hasattr(view, "result_text")
+    assert hasattr(view, "progress_bar")
 
 
 def test_display_missing_textures(view):
-    missing_textures = {'shader1': ['/path/texture1.jpg']}
+    missing_textures = {"shader1": ["/path/texture1.jpg"]}
     view.display_missing_textures(missing_textures)
-    assert 'shader1' in view._plain_text
-    assert '/path/texture1.jpg' in view._plain_text
+    assert "shader1" in view._plain_text
+    assert "/path/texture1.jpg" in view._plain_text
 
 
 def test_update_progress(view):
@@ -53,7 +53,7 @@ def test_update_progress(view):
 
 
 def test_display_relinked_textures(view):
-    relinked_textures = [('file1', '/new/path/texture1.jpg'), ('file2', '/new/path/texture2.jpg')]
+    relinked_textures = [("file1", "/new/path/texture1.jpg"), ("file2", "/new/path/texture2.jpg")]
     view.display_relinked_textures(relinked_textures)
-    assert 'file1: /new/path/texture1.jpg' in view._plain_text
-    assert 'file2: /new/path/texture2.jpg' in view._plain_text
+    assert "file1: /new/path/texture1.jpg" in view._plain_text
+    assert "file2: /new/path/texture2.jpg" in view._plain_text
